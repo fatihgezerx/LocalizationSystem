@@ -35,11 +35,11 @@ Clone or download this repository, then copy the `LocalizationSystem` folder int
 
 1. Open **Tools > Localization System > Language Data**.
 
-2. Go to **Settings** and pick the languages your project supports. This screen is also where you'll choose a translation provider and enter its API key in step 5.
+2. Go to **Settings**, pick the languages your project supports, choose a translation provider, and paste its API key.
 
 ![Settings](LocalizationSystem/ScreenShots/Settings.png)
 
-3. Back in the main table, click **Sync Project**. This scans your open scene for `Text`/`TextMeshProUGUI` components and searches your code for any field marked with `[Localize]`:
+3. Back in the main table, click **Sync Project**. This scans your open scene for `Text`/`TextMeshProUGUI` components and searches your code for any field marked with `[Localize]`. Every match appears as a row, with your source language already filled in and every other language left empty:
 
 ```csharp
 using LocalizationSystem;
@@ -51,17 +51,13 @@ public class ItemData : ScriptableObject
 }
 ```
 
-4. Every scanned entry now appears as a row in the table, with your source language already filled in and every other language empty.
-
-5. Go to **Settings**, choose a translation provider, and paste your API key.
-
-6. Back in the main table, click **Translate**. Missing translations are filled in for every language you added in step 2.
+4. Click **Translate**. Missing translations are filled in for every language you added in step 2.
 
 ![Translated table](LocalizationSystem/ScreenShots/Data.png)
 
-7. To let players change languages at runtime, add a `LanguageDropdown` component next to any `Dropdown`/`TMP_Dropdown` in your scene. It fills itself with your project's languages and switches every localized text the moment one is picked.
+5. To let players change languages at runtime, add a `LanguageDropdown` component next to any `Dropdown`/`TMP_Dropdown` in your scene. It fills itself with your project's languages and switches every localized text the moment one is picked.
 
-8. If your own code assigns a `[Localize]`-marked string to a `Text`/`TMP_Text` yourself (instead of one already wired up by Sync Project), add a `LocalizedText` component to that object and call `SetKey` rather than assigning `.text` directly:
+6. If your own code assigns a `[Localize]`-marked string to a `Text`/`TMP_Text` yourself (instead of one already wired up by Sync Project), add a `LocalizedText` component to that object and call `SetKey` rather than assigning `.text` directly:
 
 ```csharp
 label.GetComponent<LocalizedText>().SetKey(itemData.ItemName);
