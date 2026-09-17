@@ -1,0 +1,20 @@
+{
+    "name": "LocalizationSystem.Editor",
+    "rootNamespace": "LocalizationSystem",
+    "references": [
+        "LocalizationSystem.Runtime",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,479 @@
+{
+    "SourceLanguage": 10,
+    "Languages": [
+        10,
+        14,
+        15,
+        21,
+        23,
+        22,
+        27,
+        28,
+        30,
+        34,
+        36,
+        37,
+        38,
+        40,
+        41
+    ],
+    "Entries": [
+        {
+            "Key": "6eeef31e58884d29ac5d372cc3fe8250",
+            "Values": [
+                {
+                    "Language": 10,
+                    "Text": "SETTINGS"
+                },
+                {
+                    "Language": 14,
+                    "Text": "PARAMÈTRES"
+                },
+                {
+                    "Language": 15,
+                    "Text": "EINSTELLUNGEN"
+                },
+                {
+                    "Language": 21,
+                    "Text": "IMPOSTAZIONI"
+                },
+                {
+                    "Language": 23,
+                    "Text": "설정"
+                },
+                {
+                    "Language": 22,
+                    "Text": "設定"
+                },
+                {
+                    "Language": 27,
+                    "Text": "USTAWIENIA"
+                },
+                {
+                    "Language": 28,
+                    "Text": "CONFIGURAÇÕES"
+                },
+                {
+                    "Language": 30,
+                    "Text": "НАСТРОЙКИ"
+                },
+                {
+                    "Language": 34,
+                    "Text": "AJUSTES"
+                },
+                {
+                    "Language": 36,
+                    "Text": "การตั้งค่า"
+                },
+                {
+                    "Language": 37,
+                    "Text": "AYARLAR"
+                },
+                {
+                    "Language": 38,
+                    "Text": "НАЛАШТУВАННЯ"
+                },
+                {
+                    "Language": 40,
+                    "Text": "设置"
+                },
+                {
+                    "Language": 41,
+                    "Text": "設定"
+                }
+            ]
+        },
+        {
+            "Key": "7abb5023ee9148bab023d1d426fce761",
+            "Values": [
+                {
+                    "Language": 10,
+                    "Text": "QUIT"
+                },
+                {
+                    "Language": 14,
+                    "Text": "QUITTER"
+                },
+                {
+                    "Language": 15,
+                    "Text": "BEENDEN"
+                },
+                {
+                    "Language": 21,
+                    "Text": "ESCI"
+                },
+                {
+                    "Language": 23,
+                    "Text": "종료"
+                },
+                {
+                    "Language": 22,
+                    "Text": "終了"
+                },
+                {
+                    "Language": 27,
+                    "Text": "WYJŚCIE"
+                },
+                {
+                    "Language": 28,
+                    "Text": "SAIR"
+                },
+                {
+                    "Language": 30,
+                    "Text": "ВЫХОД"
+                },
+                {
+                    "Language": 34,
+                    "Text": "SALIR"
+                },
+                {
+                    "Language": 36,
+                    "Text": "ออก"
+                },
+                {
+                    "Language": 37,
+                    "Text": "ÇIKIŞ"
+                },
+                {
+                    "Language": 38,
+                    "Text": "ВИХІД"
+                },
+                {
+                    "Language": 40,
+                    "Text": "退出"
+                },
+                {
+                    "Language": 41,
+                    "Text": "退出"
+                }
+            ]
+        },
+        {
+            "Key": "14a2ce3c722b4de5a35948286f878daf",
+            "Values": [
+                {
+                    "Language": 10,
+                    "Text": "LOAD GAME"
+                },
+                {
+                    "Language": 14,
+                    "Text": "CHARGER LA PARTIE"
+                },
+                {
+                    "Language": 15,
+                    "Text": "SPIEL LADEN"
+                },
+                {
+                    "Language": 21,
+                    "Text": "CARICA PARTITA"
+                },
+                {
+                    "Language": 23,
+                    "Text": "게임 불러오기"
+                },
+                {
+                    "Language": 22,
+                    "Text": "ゲームをロード"
+                },
+                {
+                    "Language": 27,
+                    "Text": "WCZYTAJ GRĘ"
+                },
+                {
+                    "Language": 28,
+                    "Text": "CARREGAR JOGO"
+                },
+                {
+                    "Language": 30,
+                    "Text": "ЗАГРУЗИТЬ ИГРУ"
+                },
+                {
+                    "Language": 34,
+                    "Text": "CARGAR PARTIDA"
+                },
+                {
+                    "Language": 36,
+                    "Text": "โหลดเกม"
+                },
+                {
+                    "Language": 37,
+                    "Text": "OYUNU YÜKLE"
+                },
+                {
+                    "Language": 38,
+                    "Text": "ЗАВАНТАЖИТИ ГРУ"
+                },
+                {
+                    "Language": 40,
+                    "Text": "加载游戏"
+                },
+                {
+                    "Language": 41,
+                    "Text": "載入遊戲"
+                }
+            ]
+        },
+        {
+            "Key": "2f0704e5031148389f713673c78cc3e8",
+            "Values": [
+                {
+                    "Language": 10,
+                    "Text": "NEW GAME"
+                },
+                {
+                    "Language": 14,
+                    "Text": "NOUVELLE PARTIE"
+                },
+                {
+                    "Language": 15,
+                    "Text": "NEUES SPIEL"
+                },
+                {
+                    "Language": 21,
+                    "Text": "NUOVA PARTITA"
+                },
+                {
+                    "Language": 23,
+                    "Text": "새 게임"
+                },
+                {
+                    "Language": 22,
+                    "Text": "ニューゲーム"
+                },
+                {
+                    "Language": 27,
+                    "Text": "NOWA GRA"
+                },
+                {
+                    "Language": 28,
+                    "Text": "NOVO JOGO"
+                },
+                {
+                    "Language": 30,
+                    "Text": "НОВАЯ ИГРА"
+                },
+                {
+                    "Language": 34,
+                    "Text": "NUEVA PARTIDA"
+                },
+                {
+                    "Language": 36,
+                    "Text": "เกมใหม่"
+                },
+                {
+                    "Language": 37,
+                    "Text": "YENİ OYUN"
+                },
+                {
+                    "Language": 38,
+                    "Text": "НОВА ГРА"
+                },
+                {
+                    "Language": 40,
+                    "Text": "新游戏"
+                },
+                {
+                    "Language": 41,
+                    "Text": "新遊戲"
+                }
+            ]
+        },
+        {
+            "Key": "This is health potion.",
+            "Values": [
+                {
+                    "Language": 10,
+                    "Text": "This is health potion."
+                },
+                {
+                    "Language": 14,
+                    "Text": "C'est une potion de vie."
+                },
+                {
+                    "Language": 15,
+                    "Text": "Das ist ein Heiltrank."
+                },
+                {
+                    "Language": 21,
+                    "Text": "Questa è una pozione di salute."
+                },
+                {
+                    "Language": 23,
+                    "Text": "이것은 체력 물약입니다."
+                },
+                {
+                    "Language": 22,
+                    "Text": "これは体力ポーションです。"
+                },
+                {
+                    "Language": 27,
+                    "Text": "To jest mikstura zdrowia."
+                },
+                {
+                    "Language": 28,
+                    "Text": "Isto é uma poção de vida."
+                },
+                {
+                    "Language": 30,
+                    "Text": "Это зелье здоровья."
+                },
+                {
+                    "Language": 34,
+                    "Text": "Esto es una poción de salud."
+                },
+                {
+                    "Language": 36,
+                    "Text": "นี่คือยาน้ำฟื้นฟูพลังชีวิต"
+                },
+                {
+                    "Language": 37,
+                    "Text": "Bu bir can iksiri."
+                },
+                {
+                    "Language": 38,
+                    "Text": "Це зілля здоров'я."
+                },
+                {
+                    "Language": 40,
+                    "Text": "这是一瓶生命药水。"
+                },
+                {
+                    "Language": 41,
+                    "Text": "這是一瓶生命藥水。"
+                }
+            ]
+        },
+        {
+            "Key": "This is mana potion.",
+            "Values": [
+                {
+                    "Language": 10,
+                    "Text": "This is mana potion."
+                },
+                {
+                    "Language": 14,
+                    "Text": "C'est une potion de mana."
+                },
+                {
+                    "Language": 15,
+                    "Text": "Das ist ein Manatrank."
+                },
+                {
+                    "Language": 21,
+                    "Text": "Questa è una pozione di mana."
+                },
+                {
+                    "Language": 23,
+                    "Text": "이것은 마나 물약입니다."
+                },
+                {
+                    "Language": 22,
+                    "Text": "これはマナポーションです。"
+                },
+                {
+                    "Language": 27,
+                    "Text": "To jest mikstura many."
+                },
+                {
+                    "Language": 28,
+                    "Text": "Isto é uma poção de mana."
+                },
+                {
+                    "Language": 30,
+                    "Text": "Это зелье маны."
+                },
+                {
+                    "Language": 34,
+                    "Text": "Esto es una poción de maná."
+                },
+                {
+                    "Language": 36,
+                    "Text": "นี่คือยาน้ำฟื้นฟูมานา"
+                },
+                {
+                    "Language": 37,
+                    "Text": "Bu bir mana iksiri."
+                },
+                {
+                    "Language": 38,
+                    "Text": "Це зілля мани."
+                },
+                {
+                    "Language": 40,
+                    "Text": "这是一瓶法力药水。"
+                },
+                {
+                    "Language": 41,
+                    "Text": "這是一瓶法力藥水。"
+                }
+            ]
+        },
+        {
+            "Key": "This is stamina potion.",
+            "Values": [
+                {
+                    "Language": 10,
+                    "Text": "This is stamina potion."
+                },
+                {
+                    "Language": 14,
+                    "Text": "C'est une potion d'endurance."
+                },
+                {
+                    "Language": 15,
+                    "Text": "Das ist ein Ausdauertrank."
+                },
+                {
+                    "Language": 21,
+                    "Text": "Questa è una pozione di resistenza."
+                },
+                {
+                    "Language": 23,
+                    "Text": "이것은 기력 물약입니다."
+                },
+                {
+                    "Language": 22,
+                    "Text": "これはスタミナポーションです。"
+                },
+                {
+                    "Language": 27,
+                    "Text": "To jest mikstura wytrzymałości."
+                },
+                {
+                    "Language": 28,
+                    "Text": "Isto é uma poção de resistência."
+                },
+                {
+                    "Language": 30,
+                    "Text": "Это зелье выносливости."
+                },
+                {
+                    "Language": 34,
+                    "Text": "Esto es una poción de resistencia."
+                },
+                {
+                    "Language": 36,
+                    "Text": "นี่คือยาน้ำฟื้นฟูความอึด"
+                },
+                {
+                    "Language": 37,
+                    "Text": "Bu bir dayanıklılık iksiri."
+                },
+                {
+                    "Language": 38,
+                    "Text": "Це зілля витривалості."
+                },
+                {
+                    "Language": 40,
+                    "Text": "这是一瓶耐力药水。"
+                },
+                {
+                    "Language": 41,
+                    "Text": "這是一瓶耐力藥水。"
+                }
+            ]
+        }
+    ],
+    "GameContext": "",
+    "CustomGameContextPresets": []
+}
