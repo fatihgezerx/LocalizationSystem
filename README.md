@@ -51,7 +51,7 @@ public class ItemData : ScriptableObject
 }
 ```
 
-4. Click **Translate**. Missing translations are filled in for every language you added in step 2.
+4. Click **Translate**. Missing translations are filled in for every language you added in step 2, then click **Save Data** to write them to disk.
 
 ![Translated table](LocalizationSystem/ScreenShots/Data.png)
 
