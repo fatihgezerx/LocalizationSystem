@@ -35,7 +35,9 @@ Clone or download this repository, then copy the `LocalizationSystem` folder int
 
 1. Open **Tools > Localization System > Language Data**.
 
-2. Go to **Settings** and pick the languages your project supports.
+2. Go to **Settings** and pick the languages your project supports. This screen is also where you'll choose a translation provider and enter its API key in step 5.
+
+![Settings](LocalizationSystem/ScreenShots/Settings.png)
 
 3. Back in the main table, click **Sync Project**. This scans your open scene for `Text`/`TextMeshProUGUI` components and searches your code for any field marked with `[Localize]`:
 
@@ -54,6 +56,8 @@ public class ItemData : ScriptableObject
 5. Go to **Settings**, choose a translation provider, and paste your API key.
 
 6. Back in the main table, click **Translate**. Missing translations are filled in for every language you added in step 2.
+
+![Translated table](LocalizationSystem/ScreenShots/Data.png)
 
 7. To let players change languages at runtime, add a `LanguageDropdown` component next to any `Dropdown`/`TMP_Dropdown` in your scene. It fills itself with your project's languages and switches every localized text the moment one is picked.
 
