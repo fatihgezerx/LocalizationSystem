@@ -1,0 +1,62 @@
+#if HAS_UNIMVC && HAS_UGUI && HAS_TEXTMESHPRO
+using System;
+using System.Collections.Generic;
+using UniMVC;
+using UnityEngine;
+
+namespace LocalizationSystem.UI
+{
+    /// <summary>
+    /// Language picker: fills its <see cref="TMPro.TMP_Dropdown"/> with
+    /// <see cref="LocalizationRuntime.AvailableLanguages"/>, selects the current language, and calls
+    /// <see cref="LocalizationRuntime.SetLanguage"/> whenever the player picks another one. Stays in sync
+    /// when the language is changed from anywhere else.
+    /// </summary>
+    public sealed class LanguageDropdown : DropdownViewBase
+    {
+        private SystemLanguage[] _languages;
+
+        protected override void OnInitialize()
+        {
+            base.OnInitialize();
+            Populate();
+            LocalizationRuntime.LanguageChanged += OnLanguageChanged;
+        }
+
+        private void OnDestroy() => LocalizationRuntime.LanguageChanged -= OnLanguageChanged;
+
+        protected override void OnValueChanged(int index)
+        {
+            if (index >= 0 && index < _languages.Length)
+            {
+                LocalizationRuntime.SetLanguage(_languages[index]);
+            }
+        }
+
+        private void OnLanguageChanged()
+        {
+            // Raised by a static event after this dropdown was destroyed without ever being enabled.
+            if (this == null)
+            {
+                LocalizationRuntime.LanguageChanged -= OnLanguageChanged;
+                return;
+            }
+
+            SetValue(Math.Max(Array.IndexOf(_languages, LocalizationRuntime.CurrentLanguage), 0));
+        }
+
+        private void Populate()
+        {
+            _languages = LocalizationRuntime.AvailableLanguages;
+
+            var labels = new List<string>(_languages.Length);
+            foreach (var language in _languages)
+            {
+                labels.Add(LocalizationRuntime.DisplayName(language));
+            }
+
+            SetOptions(labels, Math.Max(Array.IndexOf(_languages, LocalizationRuntime.CurrentLanguage), 0));
+        }
+    }
+}
+#endif

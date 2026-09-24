@@ -11,7 +11,10 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
+    "defineConstraints": [
+        "HAS_UGUI",
+        "HAS_TEXTMESHPRO"
+    ],
     "versionDefines": [],
     "noEngineReferences": false
 }
