@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace LocalizationSystem.Setup
 {
@@ -13,12 +15,17 @@ namespace LocalizationSystem.Setup
     /// Keeps Localization System from ever breaking a project that doesn't have its dependencies yet.
     /// </summary>
     /// <remarks>
-    /// This assembly references nothing, so it always compiles. On every script reload it looks for each
-    /// dependency's assembly definition and sets or clears that dependency's scripting define symbol
-    /// (e.g. <c>HAS_UNITASK</c>). Localization System's own assemblies list those symbols as Define Constraints,
-    /// so while a dependency is missing they are simply left out of compilation - no errors - and this
-    /// guard offers to install what's missing. Once it is installed, the symbol is set and Localization System
-    /// compiles on its own. Works whether the dependencies were installed as packages or copied into Assets.
+    /// This assembly references nothing, so it always compiles. Whenever scripts reload or an assembly
+    /// definition appears or disappears, it looks for each dependency's assembly definition and sets or
+    /// clears that dependency's scripting define symbol (e.g. <c>HAS_UNITASK</c>). Localization System's own
+    /// assemblies list those symbols as Define Constraints, so while a dependency is missing they are
+    /// simply left out of compilation - no errors - and this guard offers to install what's missing:
+    /// <list type="bullet">
+    /// <item>Unity and third-party packages (Input System, UniTask...) through the Package Manager.</item>
+    /// <item>The author's own systems (Event System, UniMVC...) by downloading their repository into
+    /// <c>Assets/Scripts/...</c> - exactly as if it had been copied there by hand, so every file stays
+    /// visible and editable.</item>
+    /// </list>
     /// </remarks>
     [InitializeOnLoad]
     internal sealed class DependencyGuard : AssetPostprocessor, IActiveBuildTargetChanged
@@ -27,16 +34,24 @@ namespace LocalizationSystem.Setup
         private const string MenuPath = "Tools/Localization System/Check Dependencies";
         private const string DontAskKey = "LocalizationSystem.Setup.DontAskForDependencies";
         private const string PromptedKey = "LocalizationSystem.Setup.PromptedForDependencies";
+        private const string Branch = "main";
 
         /// <summary>Everything Localization System uses. Optional ones (with a purpose) only enable extra features.</summary>
         internal static readonly Dependency[] Dependencies =
         {
-            new Dependency("uGUI", "UnityEngine.UI", "HAS_UGUI", "com.unity.ugui", "com.unity.ugui"),
-            new Dependency("TextMeshPro", "Unity.TextMeshPro", "HAS_TEXTMESHPRO", "com.unity.ugui", "com.unity.ugui"),
-            new Dependency("UniMVC", "UniMVC.Runtime", "HAS_UNIMVC", "https://github.com/fatihgezerx/UniMVC.git", "com.fatihgezer.unimvc", "for the language dropdown"),
+            Dependency.Package("uGUI", "UnityEngine.UI", "HAS_UGUI", "com.unity.ugui", "com.unity.ugui"),
+            Dependency.Package("TextMeshPro", "Unity.TextMeshPro", "HAS_TEXTMESHPRO", "com.unity.ugui", "com.unity.ugui"),
+            Dependency.Repository("UniMVC", "UniMVC.Runtime", "HAS_UNIMVC", "https://github.com/fatihgezerx/UniMVC", "Assets/Scripts/MVC", "for the language dropdown"),
         };
 
-        private static AddAndRemoveRequest _installRequest;
+        private static AddAndRemoveRequest _packageRequest;
+        private static readonly List<Download> Downloads = new();
+
+        private sealed class Download
+        {
+            public Dependency Dependency;
+            public UnityWebRequest Request;
+        }
 
         static DependencyGuard()
         {
@@ -59,12 +74,13 @@ namespace LocalizationSystem.Setup
             }
         }
 
-        // An assembly definition appeared or disappeared (a package or folder added / deleted): re-check.
+        // An assembly definition appeared or disappeared (a package or folder added / deleted): update the
+        // symbols right away, during this import, so the compilation that follows already uses them.
         private static void OnPostprocessAllAssets(string[] imported, string[] deleted, string[] moved, string[] movedFrom)
         {
             if (ContainsAsmdef(imported) || ContainsAsmdef(deleted) || ContainsAsmdef(moved))
             {
-                EditorApplication.delayCall += () => Refresh(false);
+                Refresh(false);
             }
         }
 
@@ -111,7 +127,7 @@ namespace LocalizationSystem.Setup
                 return false;
             }
 
-            if (prompt && _installRequest == null && !Application.isBatchMode
+            if (prompt && !IsInstalling && !Application.isBatchMode
                 && !SessionState.GetBool(PromptedKey, false) && EditorUserSettings.GetConfigValue(DontAskKey) == null)
             {
                 SessionState.SetBool(PromptedKey, true);
@@ -149,20 +165,27 @@ namespace LocalizationSystem.Setup
             return result;
         }
 
+        private static bool IsInstalling => _packageRequest != null || Downloads.Count > 0;
+
         private static void Prompt(List<Dependency> missing)
         {
             var required = new StringBuilder();
             var optional = new StringBuilder();
             foreach (var dependency in missing)
             {
+                var line = dependency.IsOptional ? optional : required;
+                line.Append("• ").Append(dependency.Name);
+                if (dependency.IsRepository)
+                {
+                    line.Append(" (into ").Append(dependency.TargetFolder).Append(')');
+                }
+
                 if (dependency.IsOptional)
                 {
-                    optional.Append("• ").Append(dependency.Name).Append(" - ").AppendLine(dependency.Purpose);
+                    line.Append(" - ").Append(dependency.Purpose);
                 }
-                else
-                {
-                    required.Append("• ").AppendLine(dependency.Name);
-                }
+
+                line.AppendLine();
             }
 
             var message = new StringBuilder();
@@ -193,32 +216,134 @@ namespace LocalizationSystem.Setup
 
         private static void Install(List<Dependency> dependencies)
         {
-            var ids = new string[dependencies.Count];
-            for (var i = 0; i < ids.Length; i++)
+            var packages = new List<string>();
+            foreach (var dependency in dependencies)
             {
-                ids[i] = dependencies[i].InstallId;
+                if (dependency.IsRepository)
+                {
+                    StartDownload(dependency);
+                }
+                else
+                {
+                    packages.Add(dependency.InstallId);
+                }
             }
 
-            Debug.Log($"[{SystemName}] Installing: {string.Join(", ", ids)}");
-            _installRequest = Client.AddAndRemove(ids);
+            if (packages.Count > 0)
+            {
+                Debug.Log($"[{SystemName}] Installing: {string.Join(", ", packages)}");
+                _packageRequest = Client.AddAndRemove(packages.ToArray());
+            }
+
             EditorApplication.update += WaitForInstall;
+        }
+
+        // A repository is downloaded as a zip of its main branch and unpacked into its target folder -
+        // .meta files included, so the result is identical to copying the repository by hand.
+        private static void StartDownload(Dependency dependency)
+        {
+            var url = dependency.InstallId.TrimEnd('/') + "/archive/refs/heads/" + Branch + ".zip";
+            Debug.Log($"[{SystemName}] Downloading {dependency.Name} into {dependency.TargetFolder}");
+            var request = UnityWebRequest.Get(url);
+            request.SendWebRequest();
+            Downloads.Add(new Download { Dependency = dependency, Request = request });
         }
 
         private static void WaitForInstall()
         {
-            if (_installRequest == null || !_installRequest.IsCompleted)
+            var extracted = false;
+            for (var i = Downloads.Count - 1; i >= 0; i--)
             {
-                return;
+                var download = Downloads[i];
+                if (!download.Request.isDone)
+                {
+                    continue;
+                }
+
+                if (download.Request.result == UnityWebRequest.Result.Success)
+                {
+                    extracted |= Extract(download.Request.downloadHandler.data, download.Dependency);
+                }
+                else
+                {
+                    Debug.LogError($"[{SystemName}] Couldn't download {download.Dependency.Name}: {download.Request.error}\n" +
+                                   $"Download {download.Dependency.InstallId} yourself and copy it into {download.Dependency.TargetFolder}.");
+                }
+
+                download.Request.Dispose();
+                Downloads.RemoveAt(i);
             }
 
-            EditorApplication.update -= WaitForInstall;
-            if (_installRequest.Status == StatusCode.Failure)
+            if (extracted)
             {
-                Debug.LogError($"[{SystemName}] Couldn't install the dependencies: {_installRequest.Error?.message}\n" +
-                               "Git URLs need Git installed. You can also add them by hand in Window > Package Manager > + > Add package from git URL.");
+                AssetDatabase.Refresh();
             }
 
-            _installRequest = null;
+            if (_packageRequest != null && _packageRequest.IsCompleted)
+            {
+                if (_packageRequest.Status == StatusCode.Failure)
+                {
+                    Debug.LogError($"[{SystemName}] Couldn't install the packages: {_packageRequest.Error?.message}\n" +
+                                   "Git URLs need Git installed. You can also add them in Window > Package Manager > + > Add package from git URL.");
+                }
+
+                _packageRequest = null;
+            }
+
+            if (!IsInstalling)
+            {
+                EditorApplication.update -= WaitForInstall;
+            }
+        }
+
+        // Unpacks the zip's top folder (e.g. "UniMVC-main/") into the target folder. Files that already
+        // exist are kept, never overwritten; hidden files (.gitignore...) are skipped.
+        private static bool Extract(byte[] zip, Dependency dependency)
+        {
+            var written = 0;
+            using (var archive = new ZipArchive(new MemoryStream(zip), ZipArchiveMode.Read))
+            {
+                foreach (var entry in archive.Entries)
+                {
+                    var slash = entry.FullName.IndexOf('/');
+                    var relative = slash >= 0 ? entry.FullName.Substring(slash + 1) : string.Empty;
+                    if (relative.Length == 0 || relative.EndsWith("/") || IsHidden(relative))
+                    {
+                        continue;
+                    }
+
+                    var path = Path.Combine(dependency.TargetFolder, relative);
+                    if (File.Exists(path))
+                    {
+                        continue;
+                    }
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+                    using (var input = entry.Open())
+                    using (var output = File.Create(path))
+                    {
+                        input.CopyTo(output);
+                    }
+
+                    written++;
+                }
+            }
+
+            Debug.Log($"[{SystemName}] {dependency.Name}: {written} file(s) added to {dependency.TargetFolder}.");
+            return written > 0;
+        }
+
+        private static bool IsHidden(string relativePath)
+        {
+            foreach (var part in relativePath.Split('/'))
+            {
+                if (part.StartsWith("."))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void ApplyDefines(Dictionary<string, bool> symbols)
@@ -280,25 +405,42 @@ namespace LocalizationSystem.Setup
         /// <summary>Scripting define symbol set while it is installed.</summary>
         public readonly string Define;
 
-        /// <summary>What Package Manager installs: a package name or a git URL.</summary>
+        /// <summary>A Package Manager id (package name or git URL), or a GitHub repository URL for repositories.</summary>
         public readonly string InstallId;
 
-        /// <summary>Its package name, to notice it being removed.</summary>
+        /// <summary>Packages only: the package name, to notice it being removed.</summary>
         public readonly string PackageName;
+
+        /// <summary>Repositories only: the folder the repository is unpacked into.</summary>
+        public readonly string TargetFolder;
 
         /// <summary>Null for required dependencies; for optional ones, what they enable.</summary>
         public readonly string Purpose;
 
-        public Dependency(string name, string assembly, string define, string installId, string packageName, string purpose = null)
+        private Dependency(string name, string assembly, string define, string installId, string packageName,
+            string targetFolder, string purpose)
         {
             Name = name;
             Assembly = assembly;
             Define = define;
             InstallId = installId;
             PackageName = packageName;
+            TargetFolder = targetFolder;
             Purpose = purpose;
         }
 
+        /// <summary>A Unity or third-party package, installed through the Package Manager.</summary>
+        public static Dependency Package(string name, string assembly, string define, string installId, string packageName,
+            string purpose = null) =>
+            new(name, assembly, define, installId, packageName, null, purpose);
+
+        /// <summary>A GitHub repository, downloaded into <paramref name="targetFolder"/> like a manual copy.</summary>
+        public static Dependency Repository(string name, string assembly, string define, string repositoryUrl,
+            string targetFolder, string purpose = null) =>
+            new(name, assembly, define, repositoryUrl, null, targetFolder, purpose);
+
         public bool IsOptional => Purpose != null;
+
+        public bool IsRepository => TargetFolder != null;
     }
 }

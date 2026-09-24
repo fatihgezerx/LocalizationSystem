@@ -34,8 +34,9 @@ Clone or download this repository, then copy the `LocalizationSystem` folder int
 
 Importing it never breaks your project: a small setup script checks for its dependencies, leaves the
 system out of compilation while one is missing, and offers to install it (**Tools > Localization System >
-Check Dependencies** checks again). When UniMVC is installed too, `LanguageDropdown` is copied into your
-MVC folder's `Dropdowns/` (**Tools > Localization System > Install MVC Scripts** adds it again).
+Check Dependencies** checks again). UniMVC is downloaded into `Assets/Scripts/MVC/`, exactly as if you
+had copied it there. Once UniMVC is installed, `LanguageDropdown` is copied into your MVC folder's
+`Dropdowns/` (**Tools > Localization System > Install MVC Scripts** adds it again).
 
 ## Quick Start
 
