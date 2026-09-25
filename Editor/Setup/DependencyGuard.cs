@@ -121,6 +121,15 @@ namespace LocalizationSystem.Setup
         internal static bool Refresh(bool prompt)
         {
             var assemblies = FindAssemblyDefinitions();
+
+            // Localization System was deleted, but this code is still loaded: Unity keeps the old scripts
+            // while the project has compile errors (e.g. from code that used the deleted system). Its
+            // symbols were cleared when it was deleted, so don't set any of them again.
+            if (!assemblies.ContainsKey(Path.GetFileNameWithoutExtension(SetupAsmdefFile)))
+            {
+                return false;
+            }
+
             var symbols = new Dictionary<string, bool> { [OwnDefine] = true };
             var missing = new List<Dependency>();
 
@@ -358,7 +367,7 @@ namespace LocalizationSystem.Setup
         }
 
         // Unpacks the zip's top folder (e.g. "UniMVC-main/") into the target folder. Files that already
-        // exist are kept, never overwritten; hidden files (.gitignore...) are skipped.
+        // exist are kept, never overwritten; Git's own files (.gitignore, .github/...) are skipped.
         private static bool Extract(byte[] zip, Dependency dependency)
         {
             var written = 0;
@@ -368,7 +377,7 @@ namespace LocalizationSystem.Setup
                 {
                     var slash = entry.FullName.IndexOf('/');
                     var relative = slash >= 0 ? entry.FullName.Substring(slash + 1) : string.Empty;
-                    if (relative.Length == 0 || relative.EndsWith("/") || IsHidden(relative))
+                    if (relative.Length == 0 || relative.EndsWith("/") || IsGitFile(relative))
                     {
                         continue;
                     }
@@ -394,11 +403,13 @@ namespace LocalizationSystem.Setup
             return written > 0;
         }
 
-        private static bool IsHidden(string relativePath)
+        // Only Git's own files: other hidden files are part of the system, e.g. the MVC/.pending marker
+        // that makes MvcIntegration add its MVC scripts once the downloaded system is loaded.
+        private static bool IsGitFile(string relativePath)
         {
             foreach (var part in relativePath.Split('/'))
             {
-                if (part.StartsWith("."))
+                if (part.StartsWith(".git"))
                 {
                     return true;
                 }
