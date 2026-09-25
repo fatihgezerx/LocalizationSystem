@@ -34,9 +34,10 @@ Clone or download this repository, then copy its contents into a folder under `A
 
 For the ready-made language dropdown, a small setup script offers to install
 [UniMVC](https://github.com/fatihgezerx/UniMVC) on import. It is downloaded into `Assets/Scripts/MVC/`,
-exactly as if you had copied it there. Once UniMVC is installed, `LanguageDropdown` is copied into your MVC
-folder's `Dropdowns/`. **Tools > Localization System > Install MVC Scripts** adds it again, and offers to
-install UniMVC first if it isn't there.
+exactly as if you had copied it there. `LanguageDropdown` is then copied into your MVC folder's
+`Dropdowns/` on its own: right away if UniMVC is already in the project, or as soon as UniMVC is added
+later (by you or by the setup dialog). A dropdown you delete isn't brought back unless LocalizationSystem
+or UniMVC is imported again.
 
 ## Quick Start
 

@@ -1,0 +1,2 @@
+This hidden file marks the MVC scripts next to it as not yet added to the project.
+MvcIntegration adds them to the project's UniMVC folder as soon as UniMVC is there, then deletes this file.

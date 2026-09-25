@@ -59,13 +59,6 @@ namespace LocalizationSystem.Setup
 
         public void OnActiveBuildTargetChanged(BuildTarget previousTarget, BuildTarget newTarget) => Refresh(false);
 
-        /// <summary>Offers to install whatever is missing right now, even if it was declined earlier this session.</summary>
-        internal static void PromptForMissing()
-        {
-            SessionState.EraseBool(PromptedKey);
-            Refresh(true);
-        }
-
         // An assembly definition appeared or disappeared (a package or folder added / deleted): update the
         // symbols right away, during this import, so the compilation that follows already uses them.
         private static void OnPostprocessAllAssets(string[] imported, string[] deleted, string[] moved, string[] movedFrom)
