@@ -37,7 +37,8 @@ For the ready-made language dropdown, a small setup script offers to install
 exactly as if you had copied it there. `LanguageDropdown` is then copied into your MVC folder's
 `Dropdowns/` on its own: right away if UniMVC is already in the project, or as soon as UniMVC is added
 later (by you or by the setup dialog). A dropdown you delete isn't brought back unless LocalizationSystem
-or UniMVC is imported again.
+or UniMVC is imported again. If you remove LocalizationSystem later, the dropdown stays in your project but
+compiles to nothing until LocalizationSystem is imported again.
 
 ## Quick Start
 

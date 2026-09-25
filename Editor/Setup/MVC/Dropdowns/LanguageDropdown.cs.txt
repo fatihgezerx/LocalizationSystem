@@ -1,4 +1,4 @@
-#if HAS_UNIMVC
+#if HAS_LOCALIZATION_SYSTEM && HAS_UNIMVC
 using System;
 using System.Collections.Generic;
 using UniMVC;
