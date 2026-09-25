@@ -13,7 +13,7 @@ namespace LocalizationSystem.Setup
     /// <remarks>
     /// The scripts become ordinary project code: edit them freely. Existing files are never overwritten;
     /// the automatic copy runs once per project, and <c>Tools/Localization System/Install MVC Scripts</c> adds any
-    /// that are missing again. The MVC folder is the one holding UniMVC's <c>Bases</c>, or
+    /// that are missing again (offering to install UniMVC first if it isn't there). The MVC folder is the one holding UniMVC's <c>Bases</c>, or
     /// <c>Assets/Scripts/MVC</c> when UniMVC was installed as a package.
     /// </remarks>
     [InitializeOnLoad]
@@ -39,10 +39,12 @@ namespace LocalizationSystem.Setup
         [MenuItem(MenuPath, false, 1001)]
         private static void InstallFromMenu()
         {
+            // Something the scripts need (e.g. UniMVC) is missing: offer to install it first. The scripts
+            // are then added automatically once it is in.
             if (!DependencyGuard.AllPresent())
             {
-                Debug.LogWarning($"[{DependencyGuard.SystemName}] The MVC scripts need every dependency installed first. " +
-                                 "Use Tools > " + DependencyGuard.SystemName + " > Check Dependencies.");
+                EditorUserSettings.SetConfigValue(InstalledKey, null);
+                DependencyGuard.PromptForMissing();
                 return;
             }
 

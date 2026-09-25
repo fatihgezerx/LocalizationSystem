@@ -31,16 +31,12 @@ namespace LocalizationSystem.Setup
     internal sealed class DependencyGuard : AssetPostprocessor, IActiveBuildTargetChanged
     {
         internal const string SystemName = "Localization System";
-        private const string MenuPath = "Tools/Localization System/Check Dependencies";
-        private const string DontAskKey = "LocalizationSystem.Setup.DontAskForDependencies";
         private const string PromptedKey = "LocalizationSystem.Setup.PromptedForDependencies";
         private const string Branch = "main";
 
         /// <summary>Everything Localization System uses. Optional ones (with a purpose) only enable extra features.</summary>
         internal static readonly Dependency[] Dependencies =
         {
-            Dependency.Package("uGUI", "UnityEngine.UI", "HAS_UGUI", "com.unity.ugui", "com.unity.ugui"),
-            Dependency.Package("TextMeshPro", "Unity.TextMeshPro", "HAS_TEXTMESHPRO", "com.unity.ugui", "com.unity.ugui"),
             Dependency.Repository("UniMVC", "UniMVC.Runtime", "HAS_UNIMVC", "https://github.com/fatihgezerx/UniMVC", "Assets/Scripts/MVC", "for the language dropdown"),
         };
 
@@ -63,15 +59,11 @@ namespace LocalizationSystem.Setup
 
         public void OnActiveBuildTargetChanged(BuildTarget previousTarget, BuildTarget newTarget) => Refresh(false);
 
-        [MenuItem(MenuPath, false, 1000)]
-        private static void CheckFromMenu()
+        /// <summary>Offers to install whatever is missing right now, even if it was declined earlier this session.</summary>
+        internal static void PromptForMissing()
         {
-            EditorUserSettings.SetConfigValue(DontAskKey, null);
             SessionState.EraseBool(PromptedKey);
-            if (!Refresh(true))
-            {
-                Debug.Log($"[{SystemName}] Every dependency is installed.");
-            }
+            Refresh(true);
         }
 
         // An assembly definition appeared or disappeared (a package or folder added / deleted): update the
@@ -127,8 +119,8 @@ namespace LocalizationSystem.Setup
                 return false;
             }
 
-            if (prompt && !IsInstalling && !Application.isBatchMode
-                && !SessionState.GetBool(PromptedKey, false) && EditorUserSettings.GetConfigValue(DontAskKey) == null)
+            // Asked at most once per editor session, so "Not now" is respected until Unity restarts.
+            if (prompt && !IsInstalling && !Application.isBatchMode && !SessionState.GetBool(PromptedKey, false))
             {
                 SessionState.SetBool(PromptedKey, true);
                 Prompt(missing);
@@ -202,15 +194,9 @@ namespace LocalizationSystem.Setup
             message.Append("Until they are installed, the parts of ").Append(SystemName)
                 .Append(" that use them are left out of compilation, so the project keeps compiling.");
 
-            var choice = EditorUtility.DisplayDialogComplex(SystemName, message.ToString(), "Install", "Not now", "Don't ask again");
-            if (choice == 0)
+            if (EditorUtility.DisplayDialog(SystemName, message.ToString(), "Install", "Not now"))
             {
                 Install(missing);
-            }
-            else if (choice == 2)
-            {
-                EditorUserSettings.SetConfigValue(DontAskKey, "true");
-                Debug.Log($"[{SystemName}] Won't ask about dependencies again. Use {MenuPath} to check them later.");
             }
         }
 
