@@ -119,6 +119,17 @@ namespace LocalizationSystem
             return Data.Languages.Contains(systemLanguage) ? systemLanguage : Data.SourceLanguage;
         }
 
+        // With "Enter Play Mode Options" skipping the domain reload, statics survive from one play
+        // session to the next: without this, a session would keep the data (and language) loaded by an
+        // earlier one, ignoring anything saved in the Language Data window since - and its listeners.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            _data = null;
+            _currentLanguage = null;
+            LanguageChanged = null;
+        }
+
         private static LocalizationData Load()
         {
             var textAsset = Resources.Load<TextAsset>(ResourcePath);
