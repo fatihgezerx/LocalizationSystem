@@ -6,7 +6,7 @@ Scan, translate, and live-switch languages in Unity — for scene text and code-
 
 ## Overview
 
-EasyLocalize finds every translatable string in your project — `Text`/`TextMeshProUGUI` components in your scenes **and** any `string` field marked with `[Localize]` in your own scripts (MonoBehaviours, ScriptableObjects, even fields nested inside plain serializable classes) — and brings them all into a single Editor table.
+EasyLocalize finds every translatable string in your project — `Text`/`TextMeshProUGUI` components in your scenes **and** any `string` field marked with `[Localize]` in your own scripts (MonoBehaviours, ScriptableObjects, even fields nested inside plain serializable classes, or in lists of them) — and brings them all into a single Editor table.
 
 From that table you can translate everything with one click using Gemini, OpenAI, Claude, Google Translate, or DeepL, with automatic fallback to another provider if one runs out of quota mid-run. At runtime, `LocalizedText` (and, with [UniMVC](https://github.com/fatihgezerx/UniMVC), a `LanguageDropdown` view) apply the selected language instantly and keep it in sync whenever the player switches, with the last choice remembered between sessions.
 

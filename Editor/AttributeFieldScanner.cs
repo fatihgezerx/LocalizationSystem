@@ -62,10 +62,12 @@ namespace LocalizationSystem
                         continue;
                     }
 
-                    var property = new SerializedObject(owner).FindProperty(propertyPath);
-                    if (property != null)
+                    // A field inside list elements can't map to a single Text component, so only a plain
+                    // field is auto-wired - list elements just feed the translation table.
+                    var wireTo = propertyPath.Contains(EveryElement) ? null : owner;
+                    foreach (var property in ResolveProperties(new SerializedObject(owner), propertyPath))
                     {
-                        ProcessProperty(property, owner, data, ref found, ref added);
+                        ProcessProperty(property, wireTo, data, ref found, ref added);
                     }
                 }
             }
@@ -134,12 +136,15 @@ namespace LocalizationSystem
             }
         }
 
-        // Recurses into nested plain [Serializable] class fields (not into UnityEngine.Object
-        // references, which get their own top-level scan instead, and not into lists/arrays of
-        // nested classes - Unity's [SerializeField]/[Localize] convention here is a single embedded
-        // object, not a collection of them). The visited set is a recursion-stack guard against
-        // cyclic type references, not a global one - it's removed on the way back out so the same
-        // type can still appear via a different sibling field.
+        // Stands for "every element" in a path returned by FindLocalizedFieldPaths, e.g.
+        // "groups.Array.data[].items.Array.data[].displayName" - ResolveProperties expands it.
+        private const string EveryElement = "[]";
+
+        // Recurses into nested plain [Serializable] class fields, one embedded object or a list/array
+        // of them (e.g. an item list inside a ScriptableObject) - but not into UnityEngine.Object
+        // references, which get their own top-level scan instead. The visited set is a recursion-stack
+        // guard against cyclic type references, not a global one - it's removed on the way back out so
+        // the same type can still appear via a different sibling field.
         private static IEnumerable<string> FindLocalizedFieldPaths(Type type, string pathPrefix, HashSet<Type> visited)
         {
             if (!visited.Add(type))
@@ -163,11 +168,16 @@ namespace LocalizationSystem
                 }
 
                 var fieldType = field.FieldType;
-                if (fieldType.IsClass && fieldType != typeof(string)
-                    && !typeof(UnityEngine.Object).IsAssignableFrom(fieldType)
-                    && fieldType.IsDefined(typeof(SerializableAttribute), false))
+                if (IsNestedSerializable(fieldType))
                 {
                     foreach (var nestedPath in FindLocalizedFieldPaths(fieldType, path + ".", visited))
+                    {
+                        yield return nestedPath;
+                    }
+                }
+                else if (ElementTypeOf(fieldType) is { } elementType && IsNestedSerializable(elementType))
+                {
+                    foreach (var nestedPath in FindLocalizedFieldPaths(elementType, path + ".Array.data" + EveryElement + ".", visited))
                     {
                         yield return nestedPath;
                     }
@@ -175,6 +185,55 @@ namespace LocalizationSystem
             }
 
             visited.Remove(type);
+        }
+
+        private static bool IsNestedSerializable(Type type) =>
+            type.IsClass && type != typeof(string)
+            && !typeof(UnityEngine.Object).IsAssignableFrom(type)
+            && type.IsDefined(typeof(SerializableAttribute), false);
+
+        // The element type of a T[] or List<T>, or null for anything else.
+        private static Type ElementTypeOf(Type type)
+        {
+            if (type.IsArray)
+            {
+                return type.GetElementType();
+            }
+
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>) ? type.GetGenericArguments()[0] : null;
+        }
+
+        // The properties a path from FindLocalizedFieldPaths points at: just one for a plain path, one
+        // per list element for every "[]" in it (e.g. every item of every group).
+        private static IEnumerable<SerializedProperty> ResolveProperties(SerializedObject serializedObject, string path)
+        {
+            var marker = path.IndexOf(EveryElement, StringComparison.Ordinal);
+            if (marker < 0)
+            {
+                var property = serializedObject.FindProperty(path);
+                if (property != null)
+                {
+                    yield return property;
+                }
+
+                yield break;
+            }
+
+            var list = serializedObject.FindProperty(path.Substring(0, marker - ".Array.data".Length));
+            if (list == null || !list.isArray)
+            {
+                yield break;
+            }
+
+            var size = list.arraySize;
+            for (var i = 0; i < size; i++)
+            {
+                var elementPath = path.Substring(0, marker) + "[" + i + "]" + path.Substring(marker + EveryElement.Length);
+                foreach (var property in ResolveProperties(serializedObject, elementPath))
+                {
+                    yield return property;
+                }
+            }
         }
 
         private static List<T> LoadAllAssets<T>(string filter) where T : UnityEngine.Object
