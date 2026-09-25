@@ -216,20 +216,48 @@ namespace LocalizationSystem.Setup
             message.Append("Until they are installed, the parts of ").Append(SystemName)
                 .Append(" that use them are left out of compilation, so the project keeps compiling.");
 
-            if (EditorUtility.DisplayDialog(SystemName, message.ToString(), "Install", "Not now"))
+            // Only one kind missing: a plain Install / Not now.
+            if (required.Length == 0 || optional.Length == 0)
             {
-                Install(missing);
-            }
-            else
-            {
-                var names = new List<string>();
-                foreach (var dependency in missing)
+                if (EditorUtility.DisplayDialog(SystemName, message.ToString(), "Install", "Not now"))
                 {
-                    names.Add(dependency.Name);
+                    Install(missing);
+                }
+                else
+                {
+                    Decline(missing);
                 }
 
-                SessionState.SetString(DeclinedKey, string.Join("\n", names));
+                return;
             }
+
+            // Both: the required ones can be installed on their own. Closing the dialog counts as "Not now".
+            switch (EditorUtility.DisplayDialogComplex(SystemName, message.ToString(), "Install All", "Not now", "Install Required Only"))
+            {
+                case 0:
+                    Install(missing);
+                    break;
+                case 2:
+                    var requiredOnly = missing.FindAll(dependency => !dependency.IsOptional);
+                    Decline(missing.FindAll(dependency => dependency.IsOptional));
+                    Install(requiredOnly);
+                    break;
+                default:
+                    Decline(missing);
+                    break;
+            }
+        }
+
+        // Not asked about these again in this editor session (see WasDeclined).
+        private static void Decline(List<Dependency> dependencies)
+        {
+            var names = new List<string>();
+            foreach (var dependency in dependencies)
+            {
+                names.Add(dependency.Name);
+            }
+
+            SessionState.SetString(DeclinedKey, string.Join("\n", names));
         }
 
         private static bool WasDeclined(List<Dependency> missing)

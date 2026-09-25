@@ -42,7 +42,7 @@ compiles to nothing until LocalizationSystem is imported again.
 
 ## Quick Start
 
-1. Open **Tools > Localization System > Language Data**.
+1. Open **Tools > Language Data**.
 
 2. Go to **Settings**, pick the languages your project supports, choose a translation provider, and paste its API key.
 

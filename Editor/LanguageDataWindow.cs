@@ -316,7 +316,7 @@ namespace LocalizationSystem
             EditorGUI.DrawRect(new Rect(rect.xMax - 1f, rect.y, 1f, rect.height), border);
         }
 
-        [MenuItem("Tools/Localization System/Language Data")]
+        [MenuItem("Tools/Language Data")]
         private static void Open()
         {
             var window = GetWindow<LanguageDataWindow>("Language Data");
