@@ -1,5 +1,6 @@
 using System.IO;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEngine;
 
 namespace LocalizationSystem
@@ -13,8 +14,13 @@ namespace LocalizationSystem
         // Lives under a Resources folder (rather than a plain Data folder) so the exact same file
         // that's authored here can also be loaded at runtime via Resources.Load<TextAsset> - see
         // LocalizationRuntime. No separate export/build step, and the whole LocalizationSystem
-        // folder (including this file) stays self-contained for dropping into another project.
-        private const string RelativePath = "Assets/Scripts/LocalizationSystem/Runtime/Resources/LocalizationData.json";
+        // folder (including this file) stays self-contained for dropping into another project. The
+        // folder is found next to the runtime asmdef, wherever LocalizationSystem was copied to.
+        private static string _relativePath;
+
+        private static string RelativePath => _relativePath ??=
+            Path.GetDirectoryName(CompilationPipeline.GetAssemblyDefinitionFilePathFromAssemblyName("LocalizationSystem.Runtime"))!
+                .Replace('\\', '/') + "/Resources/LocalizationData.json";
 
         /// <summary>Loads the current data, or an empty one if the file doesn't exist yet.</summary>
         public static LocalizationData Load()

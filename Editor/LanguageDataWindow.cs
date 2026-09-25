@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEngine;
 
 namespace LocalizationSystem
@@ -211,9 +212,14 @@ namespace LocalizationSystem
         };
 
         // Optional real flag PNGs. Drop a file named e.g. "Turkish.png" (matching DisplayName exactly)
-        // into Assets/Scripts/LocalizationSystem/Editor/Flags/ and it's used automatically in place
-        // of the procedural swatch below - no code changes needed. Missing files just fall back.
-        private const string FlagsFolder = "Assets/Scripts/LocalizationSystem/Editor/Flags";
+        // into LocalizationSystem/Editor/Flags/ and it's used automatically in place of the procedural
+        // swatch below - no code changes needed. Missing files just fall back. The folder is found next
+        // to this assembly's asmdef, wherever LocalizationSystem was copied to.
+        private static string _flagsFolder;
+
+        private static string FlagsFolder => _flagsFolder ??=
+            Path.GetDirectoryName(CompilationPipeline.GetAssemblyDefinitionFilePathFromAssemblyName("LocalizationSystem.Editor"))!
+                .Replace('\\', '/') + "/Flags";
 
         private readonly Dictionary<SystemLanguage, Texture2D> _flagTextureCache = new();
 

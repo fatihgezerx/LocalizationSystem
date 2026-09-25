@@ -2,7 +2,7 @@
 
 Scan, translate, and live-switch languages in Unity — for scene text and code-driven strings alike, all from one Editor window.
 
-![EasyLocalize](LocalizationSystem/ScreenShots/LocalizationSystem.png)
+![EasyLocalize](ScreenShots/LocalizationSystem.png)
 
 ## Overview
 
@@ -30,7 +30,7 @@ From that table you can translate everything with one click using Gemini, OpenAI
 
 ### Installation
 
-Clone or download this repository, then copy the `LocalizationSystem` folder into your project's `Assets/` (e.g. `Assets/LocalizationSystem`). It's self-contained via its own Runtime/Editor assembly definitions.
+Clone or download this repository, then copy its contents into a folder under `Assets/` (e.g. `Assets/Scripts/LocalizationSystem/`). It's self-contained via its own Runtime/Editor assembly definitions.
 
 Importing it never breaks your project: a small setup script checks for its dependencies, leaves the
 system out of compilation while one is missing, and offers to install it (**Tools > Localization System >
@@ -44,7 +44,7 @@ had copied it there. Once UniMVC is installed, `LanguageDropdown` is copied into
 
 2. Go to **Settings**, pick the languages your project supports, choose a translation provider, and paste its API key.
 
-![Settings](LocalizationSystem/ScreenShots/Settings.png)
+![Settings](ScreenShots/Settings.png)
 
 3. Back in the main table, click **Sync Project**. This scans your open scene for `Text`/`TextMeshProUGUI` components and searches your code for any field marked with `[Localize]`. Every match appears as a row, with your source language already filled in and every other language left empty:
 
@@ -60,7 +60,7 @@ public class ItemData : ScriptableObject
 
 4. Click **Translate**. Missing translations are filled in for every language you added in step 2, then click **Save Data** to write them to disk.
 
-![Translated table](LocalizationSystem/ScreenShots/Data.png)
+![Translated table](ScreenShots/Data.png)
 
 5. To let players change languages at runtime with UniMVC, add the `LanguageDropdown` view (from your MVC folder's `Dropdowns/`) to a `TMP_Dropdown` under your `UIManager`. It fills itself with your project's languages and switches every localized text the moment one is picked. Without UniMVC, call `LocalizationRuntime.SetLanguage(language)` from your own UI.
 
