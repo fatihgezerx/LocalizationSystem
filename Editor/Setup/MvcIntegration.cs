@@ -13,7 +13,7 @@ namespace LocalizationSystem.Setup
     /// <remarks>
     /// The scripts become ordinary project code: edit them freely. Existing files are never overwritten;
     /// the automatic copy runs once per project, and <c>Tools/Localization System/Install MVC Scripts</c> adds any
-    /// that are missing again. The MVC folder is the one holding UniMVC's <c>_Bases</c>, or
+    /// that are missing again. The MVC folder is the one holding UniMVC's <c>Bases</c>, or
     /// <c>Assets/Scripts/MVC</c> when UniMVC was installed as a package.
     /// </remarks>
     [InitializeOnLoad]
@@ -95,7 +95,7 @@ namespace LocalizationSystem.Setup
                       (skipped > 0 ? $"\n({skipped} already existed and were kept.)" : string.Empty));
         }
 
-        // UniMVC's runtime asmdef sits in MVC/_Bases/, so the MVC folder is its parent - unless UniMVC
+        // UniMVC's runtime asmdef sits in MVC/Bases/, so the MVC folder is its parent - unless UniMVC
         // is an (immutable) package, in which case the scripts go to the default project folder.
         private static string MvcRoot(string mvcAsmdef)
         {
