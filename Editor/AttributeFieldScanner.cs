@@ -187,8 +187,11 @@ namespace LocalizationSystem
             visited.Remove(type);
         }
 
+        // A plain [Serializable] class Unity embeds in the owner. Lists and arrays are excluded: List<T>
+        // itself is [Serializable] too, but Unity serializes it as its elements, not as its own fields.
         private static bool IsNestedSerializable(Type type) =>
             type.IsClass && type != typeof(string)
+            && ElementTypeOf(type) == null
             && !typeof(UnityEngine.Object).IsAssignableFrom(type)
             && type.IsDefined(typeof(SerializableAttribute), false);
 
