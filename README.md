@@ -17,7 +17,9 @@ From that table you can translate everything with one click using Gemini, OpenAI
 - **Runtime language switching, no manual wiring** — every localized `Text`/`TMP_Text` updates the instant the language changes; the choice persists across sessions. With UniMVC, a ready-made `LanguageDropdown` view is added to your MVC folder
 - **Rename-proof keys** — scene text keeps a stable GUID key regardless of hierarchy or renames, and code-driven strings key off their own source text, so refactors never orphan a translation
 - **Filtering, CSV import/export, and virtualized rows** — filter by fully translated / missing, hand a spreadsheet to a human translator and import the results back, and browse large translation tables without Editor slowdown
-- **Opt out per-object** — an `ExcludeFromLocalization` marker component keeps specific text (e.g. a Dropdown's own label) out of the scan entirely
+- **Opt out per-object** — an `ExcludeFromLocalization` marker component keeps specific text (e.g. a Dropdown's own label) out of the scan entirely. You decide where it goes: nothing adds it for you
+- **Code-filled labels left alone** — a component implementing `ILocalizedByCode` (e.g. an interaction prompt showing whichever `[Localize]` string is current through `LocalizationRuntime.Get`) tells **Sync Project** which labels it fills itself, so they get no `LocalizedText` that would overwrite them — without any component added to them. Sync only ever adds `LocalizedText` (and takes it off such labels); nothing changes on its own when entering or leaving Play Mode
+- **Easy UI roles** — with [Easy UI](https://github.com/fatihgezerx/EasyUI), texts can be marked *Localization / Localized Text* or *Localization / Exclude From Localization* while designing a panel; the components are added when the panel is built
 
 ## Setup
 
@@ -26,14 +28,16 @@ From that table you can translate everything with one click using Gemini, OpenAI
 - Unity 6 or newer
 - uGUI and TextMeshPro (`com.unity.ugui`) — included by default
 - Optional: [UniMVC](https://github.com/fatihgezerx/UniMVC), for the ready-made language dropdown
+- Optional: [Easy UI](https://github.com/fatihgezerx/EasyUI), for the Localized Text / Exclude From Localization roles
 - An API key for at least one translation provider (Gemini, OpenAI, Claude, Google Translate, or DeepL) if you want to use in-Editor translation
 
 ### Installation
 
 Clone or download this repository, then copy its contents into a folder under `Assets/` (e.g. `Assets/Scripts/LocalizationSystem/`). It's self-contained via its own Runtime/Editor assembly definitions.
 
-For the ready-made language dropdown, a small setup script offers to install
-[UniMVC](https://github.com/fatihgezerx/UniMVC) on import. It is downloaded into `Assets/Scripts/MVC/`,
+For the ready-made language dropdown and the Easy UI roles, a small setup script offers to install
+[UniMVC](https://github.com/fatihgezerx/UniMVC) and [Easy UI](https://github.com/fatihgezerx/EasyUI) on
+import (both optional). UniMVC is downloaded into `Assets/Scripts/MVC/`,
 exactly as if you had copied it there. `LanguageDropdown` is then copied into your MVC folder's
 `Dropdowns/` on its own: right away if UniMVC is already in the project, or as soon as UniMVC is added
 later (by you or by the setup dialog). A dropdown you delete isn't brought back unless LocalizationSystem
@@ -59,6 +63,8 @@ public class ItemData : ScriptableObject
     [Localize] public string ItemDescription = "Restores 50 HP.";
 }
 ```
+
+   A `[Localize]` field on a component sitting on a `Text`/`TMP_Text` object is taken for what that object shows, and Sync wires the object's text to it. When the string is shown somewhere else instead - e.g. a tooltip's text on a button - mark it `[Localize(ShownElsewhere = true)]`: it is still offered for translation, but the object's own text is left alone.
 
 4. Click **Translate**. Missing translations are filled in for every language you added in step 2, then click **Save Data** to write them to disk.
 

@@ -45,6 +45,7 @@ namespace LocalizationSystem.Setup
         internal static readonly Dependency[] Dependencies =
         {
             Dependency.Repository("UniMVC", "UniMVC.Runtime", "HAS_UNIMVC", "https://github.com/fatihgezerx/UniMVC", "Assets/Scripts/MVC", "for the language dropdown"),
+            Dependency.Repository("Easy UI", "EasyUI.Editor", "HAS_EASYUI", "https://github.com/fatihgezerx/EasyUI", "Assets/Scripts/EasyUI", "for the Localized Text and Exclude From Localization roles in Easy UI"),
         };
 
         private static AddAndRemoveRequest _packageRequest;

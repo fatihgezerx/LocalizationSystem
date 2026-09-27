@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +16,10 @@ namespace LocalizationSystem
     /// does modify and dirty the scene (unlike the JSON data, which stays in-memory until "Save Data"
     /// is clicked). Triggered as part of "Sync Project" in the Language Data window. Anything carrying
     /// an <see cref="ExcludeFromLocalization"/> component is skipped entirely - the manual way to keep
-    /// a Dropdown's own caption/item labels, a game logo/title, or any other text out of the table.
+    /// a Dropdown's own caption/item labels, a game logo/title, or any other text out of the table. So is
+    /// a text an <see cref="ILocalizedByCode"/> fills itself (e.g. an interaction prompt's label): its code
+    /// shows translated strings there, so a <see cref="LocalizedText"/> left on it by an earlier sync is
+    /// taken off. Nothing else is ever added or removed, and never outside a sync.
     /// </summary>
     /// <remarks>
     /// The key is a GUID generated once and then left alone (via
@@ -77,10 +81,11 @@ namespace LocalizationSystem
         private static List<(string Label, string Content, GameObject GameObject)> CollectTextComponents()
         {
             var results = new List<(string, string, GameObject)>();
+            var filledByCode = new CodeFilledTexts();
 
             foreach (var text in Object.FindObjectsByType<Text>(FindObjectsSortMode.None))
             {
-                if (string.IsNullOrWhiteSpace(text.text) || IsExcluded(text.gameObject))
+                if (string.IsNullOrWhiteSpace(text.text) || IsExcluded(text.gameObject) || IsFilledByCode(text, filledByCode))
                 {
                     continue;
                 }
@@ -92,7 +97,7 @@ namespace LocalizationSystem
             // (world-space) components, so this one query covers both.
             foreach (var tmp in Object.FindObjectsByType<TMP_Text>(FindObjectsSortMode.None))
             {
-                if (string.IsNullOrWhiteSpace(tmp.text) || IsExcluded(tmp.gameObject))
+                if (string.IsNullOrWhiteSpace(tmp.text) || IsExcluded(tmp.gameObject) || IsFilledByCode(tmp, filledByCode))
                 {
                     continue;
                 }
@@ -108,5 +113,21 @@ namespace LocalizationSystem
         // text, etc. Left entirely to the user to mark - there's no way to guess this automatically
         // for every possible UI system.
         private static bool IsExcluded(GameObject gameObject) => gameObject.GetComponent<ExcludeFromLocalization>() != null;
+
+        // Filled by its own code, already translated: left out, and rid of a LocalizedText that would overwrite it.
+        private static bool IsFilledByCode(Component text, CodeFilledTexts filledByCode)
+        {
+            if (!filledByCode.Contains(text))
+            {
+                return false;
+            }
+
+            if (CodeFilledTexts.RemoveLocalizedText(text.gameObject))
+            {
+                EditorSceneManager.MarkSceneDirty(text.gameObject.scene);
+            }
+
+            return true;
+        }
     }
 }

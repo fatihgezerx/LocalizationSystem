@@ -47,7 +47,7 @@ namespace LocalizationSystem
             var allPrefabRoots = LoadAllAssets<GameObject>("t:Prefab");
             var ownersByType = new Dictionary<Type, List<UnityEngine.Object>>();
 
-            foreach (var (type, propertyPath) in FindLocalizedFields())
+            foreach (var (type, propertyPath, shownHere) in FindLocalizedFields())
             {
                 if (!ownersByType.TryGetValue(type, out var owners))
                 {
@@ -63,8 +63,9 @@ namespace LocalizationSystem
                     }
 
                     // A field inside list elements can't map to a single Text component, so only a plain
-                    // field is auto-wired - list elements just feed the translation table.
-                    var wireTo = propertyPath.Contains(EveryElement) ? null : owner;
+                    // field is auto-wired - list elements just feed the translation table. So does a field
+                    // shown somewhere else ([Localize(ShownElsewhere = true)], e.g. a tooltip's text).
+                    var wireTo = !shownHere || propertyPath.Contains(EveryElement) ? null : owner;
                     foreach (var property in ResolveProperties(new SerializedObject(owner), propertyPath))
                     {
                         ProcessProperty(property, wireTo, data, ref found, ref added);
@@ -82,7 +83,8 @@ namespace LocalizationSystem
         // on SomeDataClass). The returned string is the dotted SerializedProperty path (e.g.
         // "data.SomeField") needed to reach it from the owning Component/ScriptableObject -
         // SerializedObject.FindProperty understands that syntax natively for nested serializable data.
-        private static IEnumerable<(Type OwnerType, string PropertyPath)> FindLocalizedFields()
+        // ShownHere is false for a field marked ShownElsewhere.
+        private static IEnumerable<(Type OwnerType, string PropertyPath, bool ShownHere)> FindLocalizedFields()
         {
             foreach (var assembly in GetAssembliesUsingLocalize())
             {
@@ -103,9 +105,9 @@ namespace LocalizationSystem
                         continue;
                     }
 
-                    foreach (var path in FindLocalizedFieldPaths(type, string.Empty, new HashSet<Type>()))
+                    foreach (var (path, shownHere) in FindLocalizedFieldPaths(type, string.Empty, new HashSet<Type>()))
                     {
-                        yield return (type, path);
+                        yield return (type, path, shownHere);
                     }
                 }
             }
@@ -145,7 +147,7 @@ namespace LocalizationSystem
         // references, which get their own top-level scan instead. The visited set is a recursion-stack
         // guard against cyclic type references, not a global one - it's removed on the way back out so
         // the same type can still appear via a different sibling field.
-        private static IEnumerable<string> FindLocalizedFieldPaths(Type type, string pathPrefix, HashSet<Type> visited)
+        private static IEnumerable<(string Path, bool ShownHere)> FindLocalizedFieldPaths(Type type, string pathPrefix, HashSet<Type> visited)
         {
             if (!visited.Add(type))
             {
@@ -161,25 +163,26 @@ namespace LocalizationSystem
 
                 var path = pathPrefix + field.Name;
 
-                if (field.GetCustomAttribute<LocalizeAttribute>() != null)
+                var localize = field.GetCustomAttribute<LocalizeAttribute>();
+                if (localize != null)
                 {
-                    yield return path;
+                    yield return (path, !localize.ShownElsewhere);
                     continue;
                 }
 
                 var fieldType = field.FieldType;
                 if (IsNestedSerializable(fieldType))
                 {
-                    foreach (var nestedPath in FindLocalizedFieldPaths(fieldType, path + ".", visited))
+                    foreach (var nested in FindLocalizedFieldPaths(fieldType, path + ".", visited))
                     {
-                        yield return nestedPath;
+                        yield return nested;
                     }
                 }
                 else if (ElementTypeOf(fieldType) is { } elementType && IsNestedSerializable(elementType))
                 {
-                    foreach (var nestedPath in FindLocalizedFieldPaths(elementType, path + ".Array.data" + EveryElement + ".", visited))
+                    foreach (var nested in FindLocalizedFieldPaths(elementType, path + ".Array.data" + EveryElement + ".", visited))
                     {
-                        yield return nestedPath;
+                        yield return nested;
                     }
                 }
             }
@@ -347,7 +350,14 @@ namespace LocalizationSystem
                 return;
             }
 
-            if (gameObject.GetComponent<Text>() != null || gameObject.GetComponent<TMP_Text>() != null)
+            // A label its code fills itself (an ILocalizedByCode) shows this string translated already.
+            Component text = gameObject.GetComponent<TMP_Text>();
+            if (text == null)
+            {
+                text = gameObject.GetComponent<Text>();
+            }
+
+            if (text != null && !new CodeFilledTexts().Contains(text))
             {
                 // The key already is the source text, so it doubles as its own fallback.
                 LocalizedTextComponentSync.Ensure(gameObject, key, key);

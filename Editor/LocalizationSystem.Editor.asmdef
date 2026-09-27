@@ -4,7 +4,8 @@
     "references": [
         "LocalizationSystem.Runtime",
         "UnityEngine.UI",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "EasyUI.Editor"
     ],
     "includePlatforms": [
         "Editor"

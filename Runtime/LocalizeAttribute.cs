@@ -17,5 +17,11 @@ namespace LocalizationSystem
     [AttributeUsage(AttributeTargets.Field)]
     public sealed class LocalizeAttribute : Attribute
     {
+        /// <summary>
+        /// The string is shown somewhere else - e.g. in a tooltip - not by a <c>Text</c>/<c>TMP_Text</c> on the
+        /// object holding it. "Sync Project" still offers it for translation, but never wires that object's own
+        /// text to it (which it does otherwise, taking the field for what the object shows).
+        /// </summary>
+        public bool ShownElsewhere { get; set; }
     }
 }
