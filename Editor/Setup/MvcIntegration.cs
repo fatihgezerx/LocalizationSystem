@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEditor;
@@ -70,6 +71,18 @@ namespace LocalizationSystem.Setup
             var templateRoot = TemplateRoot(setupAsmdef);
             var mvcRoot = MvcRoot(mvcAsmdef);
 
+            // A script that was moved to another folder inside the MVC folder still counts as there: it's looked up
+            // by file name anywhere under the MVC folder, so reorganizing the generated scripts doesn't make them come
+            // back as duplicates (and compile errors) the next time UniMVC is reimported.
+            var existing = new HashSet<string>();
+            if (Directory.Exists(mvcRoot))
+            {
+                foreach (var existingPath in Directory.GetFiles(mvcRoot, "*.cs", SearchOption.AllDirectories))
+                {
+                    existing.Add(Path.GetFileName(existingPath));
+                }
+            }
+
             var written = new StringBuilder();
             foreach (var guid in AssetDatabase.FindAssets("t:TextAsset", new[] { templateRoot }))
             {
@@ -81,7 +94,7 @@ namespace LocalizationSystem.Setup
 
                 var relative = templatePath.Substring(templateRoot.Length + 1);
                 var targetPath = mvcRoot + "/" + relative.Substring(0, relative.Length - ".txt".Length);
-                if (File.Exists(targetPath))
+                if (File.Exists(targetPath) || existing.Contains(Path.GetFileName(targetPath)))
                 {
                     continue;
                 }
