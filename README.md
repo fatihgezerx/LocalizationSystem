@@ -87,6 +87,8 @@ With the optional [Veneer](https://github.com/fatihgezerx/Veneer) in the project
 
 The bottom bar has **Save Data** (lit while there are unsaved changes), the provider's quota and the main **Translate** button. A `LocalizedText` component shows its key's state (translated, N missing, not in table), the key and fallback text read-only, its text in every language, and a button that opens the window. `ExcludeFromLocalization` explains what the marker does.
 
+The `LocalizedText` and `ExcludeFromLocalization` Inspectors are drawn from default layouts that Localization System ships, so they can be customised in `Tools > Veneer > Inspector Designer` (Customize makes your own copy, Reset goes back to the default). The system's own pieces (the key pill, the key hint, the translations list, the Open Language Data button) can be moved or hidden there, but not changed.
+
 Without Veneer nothing is lost: `Tools > Language Data` is the plain IMGUI window, `LocalizedText` and `ExcludeFromLocalization` use Unity's default Inspector.
 
 ## License
