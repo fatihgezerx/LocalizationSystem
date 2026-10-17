@@ -37,6 +37,7 @@ namespace LocalizationSystem
         private VisualElement tablePage;
         private VisualElement settingsPage;
         private VisualElement tabBar;
+        private VeneerStyle.TabSwitcher pageSwitcher;
         private Button syncButton;
         private Button clearButton;
         private Button saveButton;
@@ -117,9 +118,12 @@ namespace LocalizationSystem
             body.Add(tablePage);
             body.Add(settingsPage);
 
+            pageSwitcher = new VeneerStyle.TabSwitcher(body, new[] { tablePage, settingsPage });
+            pageSwitcher.Initialize(tabBar, viewIndex);
+            pageSwitcher.Snap(viewIndex);
+
             content.Add(BuildFooter());
 
-            SelectView(viewIndex);
             Every(1000, RefreshRateLimit);
             RefreshAll();
         }
@@ -159,18 +163,20 @@ namespace LocalizationSystem
         private void SelectView(int index)
         {
             viewIndex = index;
-            VeneerStyle.SetDisplay(tablePage, index == 0);
-            VeneerStyle.SetDisplay(settingsPage, index == 1);
-            if (tabBar != null)
+            if (tabBar != null && VeneerStyle.GetSegmentedSelected(tabBar) != index)
             {
                 // The tab bar keeps its own selection when clicked; this keeps it right when the view is changed from code.
-                int tabIndex = 0;
-                foreach (VisualElement tab in tabBar.Children())
-                {
-                    tab.EnableInClassList("vn-tab--selected", tabIndex == index);
-                    tabIndex++;
-                }
+                VeneerStyle.SetSegmentedSelected(tabBar, index);
             }
+
+            if (pageSwitcher != null)
+            {
+                pageSwitcher.Switch(index);
+                return;
+            }
+
+            VeneerStyle.SetDisplay(tablePage, index == 0);
+            VeneerStyle.SetDisplay(settingsPage, index == 1);
         }
 
         private void OpenSettings()
