@@ -1,0 +1,368 @@
+/*
+ * Localization System - brand and Language Data window styles, added on top of the Veneer sheet.
+ *
+ * The accent is the exact Localization System blue (#3E63DD). The brand passes the class "loc-accent" as its accent class, so the kit
+ * adds no accent preset of its own and these rules are the only ones that set the accent variables.
+ * The rest styles the translation table, the language columns, the flags and the Settings page. Spacing is margins only (no gap in USS).
+ */
+
+.vn-root.loc-accent {
+    --vn-accent: #3E63DD;
+    --vn-accent-soft: rgba(62, 99, 221, 0.16);
+    --vn-accent-line: rgba(62, 99, 221, 0.55);
+    --vn-pressed: rgba(62, 99, 221, 0.24);
+}
+
+.vn-root.vn-root--light.loc-accent {
+    --vn-accent: #3451B8;
+    --vn-accent-soft: rgba(52, 81, 184, 0.14);
+    --vn-accent-line: rgba(52, 81, 184, 0.60);
+    --vn-pressed: rgba(52, 81, 184, 0.22);
+}
+
+/* ------------------------------------------------------------------ window layout */
+
+.loc-body {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+    padding: 6px 8px 0 8px;
+}
+
+.loc-actions {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.loc-actions > * {
+    margin-right: 4px;
+}
+
+.loc-stats {
+    flex-direction: row;
+    margin-bottom: 6px;
+}
+
+.loc-stats > .vn-kpi {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-right: 6px;
+}
+
+/*
+ * The two pages (table, settings) start at height 0 and only grow into the room left under the tab bar. Before, their natural
+ * height (the Settings ScrollView is as tall as all its cards) took part in the flex-shrink calculation, so the window squeezed the
+ * action row, the counters and the tab bar (a 28 px tab inside a ~16 px bar: the bar's bottom line ran through the labels).
+ * Everything that has a fixed height now refuses to shrink, and both pages share the same rule, so switching tabs never moves anything.
+ */
+.loc-body > .loc-actions,
+.loc-body > .loc-stats,
+.loc-body > .vn-tabs {
+    flex-shrink: 0;
+}
+
+.loc-page,
+.loc-settings {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    min-height: 0;
+}
+
+.loc-page {
+    min-height: 120px;
+}
+
+.loc-footer {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 6px 8px;
+    border-top-width: 1px;
+    border-top-color: var(--vn-card-border);
+}
+
+.loc-footer > * {
+    margin-right: 6px;
+}
+
+.loc-quota {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.loc-quota__bar {
+    width: 90px;
+    flex-shrink: 0;
+    margin-right: 6px;
+}
+
+.loc-quota__label {
+    font-size: 10px;
+    color: var(--vn-text-muted);
+    flex-shrink: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.loc-quota__label--exhausted {
+    color: var(--vn-error);
+}
+
+/* ------------------------------------------------------------------ filter bar */
+
+.loc-filter {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 6px 0 2px 0;
+}
+
+.loc-filter > * {
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+
+.loc-filter__search {
+    min-width: 180px;
+    max-width: 300px;
+    flex-grow: 1;
+    flex-basis: 180px;
+}
+
+.loc-filter__label {
+    font-size: 10px;
+    color: var(--vn-text-muted);
+    margin: 0 4px 0 6px;
+    -unity-font-style: bold;
+}
+
+/* ------------------------------------------------------------------ table */
+
+/*
+ * The table frame, the header row and the row hover use Unity's own class names for the multi-column view
+ * (unity-multi-column-header, __column, unity-collection-view__item). Each rule only adds to the box, so if one name ever changes
+ * the table still works and only that detail falls back to Unity's default look. The column separators and row lines are drawn by
+ * the "loc-td" boxes and the "loc-head" elements this window creates itself.
+ */
+.loc-table {
+    flex-grow: 1;
+    margin-top: 2px;
+    border-width: 1px;
+    border-radius: 6px;
+    border-color: var(--vn-card-border);
+    background-color: transparent;
+    overflow: hidden;
+}
+
+.loc-table .unity-multi-column-header {
+    background-color: var(--vn-track);
+    border-bottom-width: 1px;
+    border-bottom-color: var(--vn-accent-line);
+}
+
+.loc-table .unity-multi-column-header__column {
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    border-left-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-right-width: 1px;
+    border-right-color: var(--vn-card-border);
+}
+
+.loc-table .unity-multi-column-view__cell {
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+}
+
+.loc-table .unity-collection-view__item {
+    background-color: transparent;
+}
+
+.loc-table .unity-collection-view__item--alternative-background {
+    background-color: var(--vn-card);
+}
+
+.loc-table .unity-collection-view__item:hover {
+    background-color: var(--vn-hover);
+}
+
+/* one cell box: the vertical separator at its right edge and a thin line under the row */
+.loc-td {
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 6px;
+    border-right-width: 1px;
+    border-right-color: var(--vn-card-border);
+    border-bottom-width: 1px;
+    border-bottom-color: var(--vn-card-border);
+}
+
+.loc-cell {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 1px 0;
+}
+
+.loc-cell > .unity-base-text-field__input {
+    background-color: transparent;
+    border-width: 1px;
+    border-color: transparent;
+    border-radius: 3px;
+    color: var(--vn-text);
+    min-height: 20px;
+}
+
+.loc-cell:hover > .unity-base-text-field__input {
+    border-color: var(--vn-card-border);
+}
+
+.loc-cell:focus > .unity-base-text-field__input {
+    background-color: var(--vn-track);
+    border-color: var(--vn-accent-line);
+}
+
+.loc-cell.loc-cell--missing > .unity-base-text-field__input {
+    background-color: var(--vn-warn-bg);
+    border-color: var(--vn-warn-line);
+}
+
+.loc-status {
+    justify-content: center;
+}
+
+.loc-key {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    font-size: 10px;
+    color: var(--vn-text-muted);
+    padding: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -unity-text-align: middle-left;
+}
+
+.loc-head {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+    min-width: 0;
+    height: 28px;
+    padding: 0 8px;
+}
+
+.loc-head > * {
+    margin-right: 4px;
+}
+
+.loc-head__name {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -unity-font-style: bold;
+}
+
+.loc-head .vn-icon-button {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+.loc-flag {
+    width: 22px;
+    height: 14px;
+    flex-shrink: 0;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+/* ------------------------------------------------------------------ settings page */
+
+.loc-lang {
+    flex-direction: row;
+    align-items: center;
+    padding: 3px 4px;
+    border-radius: 4px;
+}
+
+.loc-lang:hover {
+    background-color: var(--vn-hover);
+}
+
+.loc-lang > * {
+    margin-right: 6px;
+}
+
+.loc-lang__name {
+    flex-grow: 1;
+    min-width: 90px;
+}
+
+.loc-lang__chip {
+    width: 88px;
+}
+
+.loc-lang__source {
+    width: 96px;
+}
+
+.loc-provider {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.loc-provider > * {
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+
+.loc-key-row {
+    flex-direction: row;
+    align-items: center;
+    margin: 4px 0;
+}
+
+.loc-key-row > TextField {
+    flex-grow: 1;
+    margin: 0 6px 0 0;
+}
+
+.loc-context {
+    margin: 6px 0;
+}
+
+.loc-context > .unity-base-text-field__input {
+    min-height: 96px;
+    white-space: normal;
+}
+
+.loc-preset-row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.loc-preset-row > * {
+    margin-right: 6px;
+}
+
+.loc-preset-row > TextField {
+    flex-grow: 1;
+    margin-left: 0;
+}

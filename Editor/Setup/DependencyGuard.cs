@@ -45,6 +45,7 @@ namespace LocalizationSystem.Setup
         {
             Dependency.Repository("UniMVC", "UniMVC.Runtime", "HAS_UNIMVC", "https://github.com/fatihgezerx/UniMVC", "Assets/Scripts/MVC", "for the language dropdown"),
             Dependency.Repository("Easy UI", "EasyUI.Editor", "HAS_EASYUI", "https://github.com/fatihgezerx/EasyUI", "Assets/Scripts/EasyUI", "for the Localized Text and Exclude From Localization roles in Easy UI"),
+            Dependency.Repository("Veneer", "Veneer.Editor", "HAS_VENEER", "https://github.com/fatihgezerx/Veneer", "Assets/Scripts/Veneer", "for the studio-style Language Data window and Inspectors"),
         };
 
         private static AddAndRemoveRequest _packageRequest;

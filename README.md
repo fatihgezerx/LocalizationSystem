@@ -78,6 +78,17 @@ public class ItemData : ScriptableObject
 label.GetComponent<LocalizedText>().SetKey(itemData.ItemName);
 ```
 
+## In the editor
+
+With the optional [Veneer](https://github.com/fatihgezerx/Veneer) in the project (the setup dialog offers to download it), **Tools > Language Data** opens a window in the shared studio look with a blue Localization System accent. A title bar with the logo carries a state pill (*Saved*, *Unsaved changes*, *Translating*). Under it: the action buttons (**Sync Project**, **Export CSV**, **Import CSV**, **Clear Data**), four counters (keys, complete, missing, languages) and two tabs.
+
+- **Translations**: the table, drawn as a real grid: a header row (flag, language name and a *Source* badge per column) with its own background and a bottom line, thin separators between the columns and between the rows, a fixed narrow *Status* column, language columns of a fixed width (more languages than fit make the table scroll sideways, with the scroll bar just above the footer), a rounded border and a hover highlight. One row per key, one column per language, inline editing and a highlight on every empty cell. A status pill per row says *Complete* or *N missing*. Search finds keys and text; the filter chips show all, fully translated or missing rows; the *Show* chips hide language columns (view only) and *Keys* shows the internal key. The arrows in a column header move that language, the source language is pinned first. The table is virtualized, so thousands of rows stay fast.
+- **Settings**: three cards. *Languages* (include a language, set the source), *Translation provider* (provider chips, the API key, a warning for languages Google Translate or DeepL cannot do) and *Game context* (genre presets, your own saved presets, the free text sent with every AI request).
+
+The bottom bar has **Save Data** (lit while there are unsaved changes), the provider's quota and the main **Translate** button. A `LocalizedText` component shows its key's state (translated, N missing, not in table), the key and fallback text read-only, its text in every language, and a button that opens the window. `ExcludeFromLocalization` explains what the marker does.
+
+Without Veneer nothing is lost: `Tools > Language Data` is the plain IMGUI window, `LocalizedText` and `ExcludeFromLocalization` use Unity's default Inspector.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).

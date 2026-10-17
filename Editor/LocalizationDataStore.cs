@@ -55,7 +55,11 @@ namespace LocalizationSystem
             File.Move(tempPath, fullPath);
 
             AssetDatabase.ImportAsset(RelativePath);
+            DataSaved?.Invoke();
         }
+
+        /// <summary>Raised after <see cref="Save"/> wrote the file, so open Inspectors can refresh what they show about the table.</summary>
+        public static event System.Action DataSaved;
 
         private static string ToFullPath()
         {
